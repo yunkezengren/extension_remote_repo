@@ -1,11 +1,11 @@
 [
   {
     "archive_url": "https://github.com/atticus-lv/AddShaderAttribute/archive/refs/heads/master.zip",
-    "enabled": false,
+    "enabled": true,
     "website": "https://github.com/atticus-lv/AddShaderAttribute",
     "tags": [
       "Shader"
     ],
-    "notes": "This is a branch source archive, not a GitHub Release asset URL. Keep enabled false until a releases/download/... .zip link is available."
+    "notes": "Using a GitHub source archive directly from the master branch."
   }
 ]

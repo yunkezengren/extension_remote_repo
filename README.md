@@ -4,9 +4,9 @@ This repository builds a Blender Extensions static repository for GitHub Pages.
 
 It keeps only one manually maintained source file, `sources.json`, and does not
 commit extension ZIP archives into the repository. During local generation or
-GitHub Actions deployment, the generator downloads each configured GitHub
-Release asset, reads `blender_manifest.toml`, validates it, and produces a
-Blender Extension Listing API v1 compatible `index.json`.
+GitHub Actions deployment, the generator downloads each configured GitHub ZIP
+source, reads `blender_manifest.toml`, validates it, and produces a Blender
+Extension Listing API v1 compatible `index.json`.
 
 The published repository URL for Blender is:
 
@@ -70,8 +70,7 @@ Minimum format:
 
 Supported fields:
 
-- `archive_url`: required. Must be a direct GitHub Release asset URL ending in
-  `.zip`.
+- `archive_url`: required. Must be a supported GitHub ZIP URL ending in `.zip`.
 - `enabled`: optional. Defaults to `true`. When set to `false`, the entry is
   skipped completely.
 - `website`: optional. Overrides `website` from `blender_manifest.toml`.
@@ -97,14 +96,16 @@ Example:
 ```
 
 The committed example currently uses a GitHub branch archive URL only as a
-homepage placeholder. It stays disabled on purpose because it is not a valid
-`releases/download/... .zip` release asset URL.
+real source and is enabled. This works as long as the downloaded ZIP still
+contains a valid `blender_manifest.toml`.
 
 ## URL requirements
 
-`archive_url` must be a GitHub Release asset direct link in this form:
+`archive_url` can use either of these GitHub ZIP forms:
 
-`https://github.com/<owner>/<repo>/releases/download/<tag>/<file>.zip`
+- `https://github.com/<owner>/<repo>/releases/download/<tag>/<file>.zip`
+- `https://github.com/<owner>/<repo>/archive/refs/heads/<branch>.zip`
+- `https://github.com/<owner>/<repo>/archive/refs/tags/<tag>.zip`
 
 Rejected examples:
 
@@ -130,7 +131,7 @@ metadata.
 
 For every enabled source, the generator checks:
 
-- the URL shape is a direct GitHub Release asset URL
+- the URL shape is a supported GitHub ZIP URL
 - the download request succeeds
 - the downloaded response is a readable ZIP archive
 - `blender_manifest.toml` exists in the ZIP
@@ -163,7 +164,7 @@ The root homepage also shows:
 - the repository JSON endpoints
 - the configured source archive paths from `sources.json`
 - whether each source is enabled
-- whether each source is publishable under the strict GitHub Release asset rules
+- whether each source is a valid release asset or source archive
 
 `index.json` uses the Blender Extension Listing API v1 top-level structure:
 
@@ -224,7 +225,7 @@ repository:
 
 ## Minimal runnable example
 
-The committed `sources.json` contains one disabled placeholder entry. That means
+The committed `sources.json` contains one working source entry. That means
 you can run:
 
 ```bash
@@ -233,13 +234,13 @@ python scripts/generate_index.py
 
 immediately after cloning the repository and it will produce:
 
-- a valid empty `dist/index.json`
+- a generated `dist/index.json`
 - a simple `dist/index.html`
 - `dist/.nojekyll`
 
 To publish a real extension repository:
 
-1. Replace the placeholder `archive_url` with a real GitHub Release ZIP asset.
+1. Replace or extend the configured `archive_url` values with supported GitHub ZIP URLs.
 2. Set `enabled` to `true` or remove it.
 3. Run the script locally or push to `main`.
 
@@ -305,16 +306,15 @@ That is why this project publishes the JSON file at the explicit static path
 
 ## Common errors and troubleshooting
 
-### The workflow fails with "archive_url must be a release asset"
+### The workflow fails with an archive_url validation error
 
 You probably used one of these by mistake:
 
 - a release page URL
 - `releases/latest`
-- a source code archive URL
 - a URL that does not end in `.zip`
 
-Use the exact browser download URL from the release asset.
+Use one of the supported GitHub ZIP URL shapes documented above.
 
 ### The workflow fails with "Downloaded content is not a valid zip archive"
 
@@ -373,7 +373,7 @@ The official static repository guide documents `blender --command extension
 server-generate --repo-dir=...` for local ZIP archives. This repository does not
 use that command because the project requirement is to keep ZIP files out of the
 repository itself. Instead, it reproduces the minimal required output format in
-Python after downloading release assets during generation.
+Python after downloading GitHub ZIP archives during generation.
 
 The official Blender service endpoint `https://extensions.blender.org/api/v1/extensions/`
 is served by a dynamic web application. This repository can mirror that path

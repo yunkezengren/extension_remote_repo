@@ -23,6 +23,9 @@ USER_AGENT = "blender-static-repository-generator/1.0"
 GITHUB_RELEASE_ASSET_RE = re.compile(
     r"^/([^/]+)/([^/]+)/releases/download/([^/]+)/([^/]+\.zip)$"
 )
+GITHUB_ARCHIVE_RE = re.compile(
+    r"^/([^/]+)/([^/]+)/archive/refs/(heads|tags)/.+\.zip$"
+)
 SEMVER_RE = re.compile(r"^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$")
 BLENDER_VERSION_RE = re.compile(r"^\d+\.\d+\.\d+$")
 ALLOWED_SOURCE_KEYS = {"archive_url", "enabled", "website", "tags", "notes"}
@@ -127,12 +130,12 @@ def validate_archive_url(url: str) -> None:
 
     if parsed.scheme != "https":
         raise ValidationError(
-            f"archive_url must use https and point to GitHub Releases: {url}"
+            f"archive_url must use https and point to GitHub ZIP archives: {url}"
         )
 
     if parsed.netloc != "github.com":
         raise ValidationError(
-            f"archive_url must use github.com release asset URLs: {url}"
+            f"archive_url must use github.com ZIP archive URLs: {url}"
         )
 
     if "/releases/tag/" in parsed.path:
@@ -147,15 +150,30 @@ def validate_archive_url(url: str) -> None:
 
     if not parsed.path.endswith(".zip"):
         raise ValidationError(
-            f"archive_url must end with .zip and point to a release asset: {url}"
+            f"archive_url must end with .zip and point to a supported GitHub archive: {url}"
         )
 
-    if not GITHUB_RELEASE_ASSET_RE.match(parsed.path):
-        raise ValidationError(
-            "archive_url must match "
-            "https://github.com/<owner>/<repo>/releases/download/<tag>/<file>.zip: "
-            f"{url}"
-        )
+    if GITHUB_RELEASE_ASSET_RE.match(parsed.path):
+        return
+
+    if GITHUB_ARCHIVE_RE.match(parsed.path):
+        return
+
+    raise ValidationError(
+        "archive_url must match either "
+        "https://github.com/<owner>/<repo>/releases/download/<tag>/<file>.zip "
+        "or https://github.com/<owner>/<repo>/archive/refs/<heads|tags>/<name>.zip: "
+        f"{url}"
+    )
+
+
+def describe_source_kind(url: str) -> str:
+    path = urllib.parse.urlparse(url).path
+    if GITHUB_RELEASE_ASSET_RE.match(path):
+        return "release asset"
+    if GITHUB_ARCHIVE_RE.match(path):
+        return "source archive"
+    return "unsupported"
 
 
 def download_archive(url: str) -> bytes:
@@ -381,6 +399,7 @@ def build_source_summaries(sources: list[dict]) -> list[dict]:
                 "tags": source["tags"],
                 "notes": source["notes"],
                 "is_release_asset": validation_error is None,
+                "source_kind": describe_source_kind(source["archive_url"]),
                 "validation_error": validation_error,
             }
         )
@@ -418,7 +437,11 @@ def render_html(index_data: dict, source_summaries: list[dict]) -> str:
     source_rows: list[str] = []
     for source in source_summaries:
         status = "enabled" if source["enabled"] else "disabled"
-        validity = "valid release asset" if source["is_release_asset"] else "not publishable yet"
+        validity = (
+            f"valid {source['source_kind']}"
+            if source["is_release_asset"]
+            else "not publishable yet"
+        )
         meta_parts = [status, validity]
         if source["tags"]:
             meta_parts.append("tags: " + ", ".join(source["tags"]))
