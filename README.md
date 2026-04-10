@@ -7,7 +7,7 @@
 1. fork 这个仓库
 2. 在 `sources.json` 里添加你的扩展 ZIP 链接
 3. push 到 GitHub，让 Actions 自动生成并部署
-4. 在 Blender 里填入仓库的 `index.json` 地址
+4. 在 Blender 里填入仓库完整地址：`/api/v1/extensions/index.json`
 
 ## 你需要修改的文件
 
@@ -43,7 +43,7 @@
 - `enabled`：可选，默认 `true`
 - `website`：可选
 - `tags`：可选
-- `notes`：可选，仅供维护备注，不会写入 `index.json`
+- `notes`：可选，仅供维护备注，不会写入最终仓库 JSON
 
 ## 本地生成
 
@@ -55,7 +55,6 @@ python3 scripts/generate_index.py
 
 生成结果在：
 
-- `dist/index.json`
 - `dist/api/v1/extensions/index.json`
 - `dist/index.html`
 
@@ -78,10 +77,6 @@ GitHub Pages 部署成功后，把下面这个地址填到 Blender 的 Remote Re
 
 `https://<your-user>.github.io/<your-repo>/api/v1/extensions/index.json`
 
-兼容地址也可以用：
-
-`https://<your-user>.github.io/<your-repo>/index.json`
-
 Blender 中的添加步骤：
 
 1. 打开 Blender
@@ -95,6 +90,7 @@ Blender 中的添加步骤：
 ## 说明
 
 - 仓库不会提交 ZIP 文件
-- `index.json` 会在构建时自动生成
+- 仓库 JSON 会在构建时自动生成
+- Blender 入口只保留 `https://<your-user>.github.io/<your-repo>/api/v1/extensions/index.json`
 - 元数据主要来自 ZIP 内的 `blender_manifest.toml`
 - 如果某个 ZIP 不符合 Blender 扩展格式，生成会直接报错

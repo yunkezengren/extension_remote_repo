@@ -508,8 +508,7 @@ def render_html(index_data: dict, source_summaries: list[dict]) -> str:
     <header>
       <h1>Blender Extensions Repository</h1>
       <p>This static repository is published for Blender Remote Repository usage.</p>
-      <p>Repository entry: <a href="./index.json"><code>/index.json</code></a></p>
-      <p>Official-style entry: <a href="./api/v1/extensions/index.json"><code>/api/v1/extensions/index.json</code></a></p>
+      <p>Repository entry: <a href="./api/v1/extensions/index.json"><code>/api/v1/extensions/index.json</code></a></p>
     </header>
     <main>
       <h2>Published extensions</h2>
@@ -568,16 +567,12 @@ def write_outputs(
     write_html: bool,
 ) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
-    index_path = output_dir / "index.json"
     api_dir = output_dir / "api" / "v1" / "extensions"
     api_dir.mkdir(parents=True, exist_ok=True)
     api_index_path = api_dir / "index.json"
 
     json_payload = json.dumps(index_data, indent=2, ensure_ascii=True) + "\n"
 
-    index_path.write_text(
-        json_payload, encoding="utf-8"
-    )
     api_index_path.write_text(json_payload, encoding="utf-8")
 
     if write_html:
@@ -630,9 +625,9 @@ def main() -> int:
         return 1
 
     print(
-        f"Wrote {output_dir / 'index.json'} with {len(index_data['data'])} extension(s)."
+        f"Wrote {output_dir / 'api/v1/extensions/index.json'} "
+        f"with {len(index_data['data'])} extension(s)."
     )
-    print(f"Wrote {output_dir / 'api/v1/extensions/index.json'}.")
     if not args.skip_html:
         print(f"Wrote {output_dir / 'index.html'}.")
         print(f"Wrote {output_dir / 'api/v1/extensions/index.html'}.")
