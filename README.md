@@ -75,7 +75,7 @@ python3 scripts/generate_index.py
 
 GitHub Pages 部署成功后，把下面这个地址填到 Blender 的 Remote Repository：
 
-`https://<your-user>.github.io/<your-repo>/api/v1/extensions/index.json`
+`https://yunkezengren.github.io/extension_remote_repo/api/v1/extensions/index.json`
 
 Blender 中的添加步骤：
 
@@ -91,6 +91,6 @@ Blender 中的添加步骤：
 
 - 仓库不会提交 ZIP 文件
 - 仓库 JSON 会在构建时自动生成
-- Blender 入口只保留 `https://<your-user>.github.io/<your-repo>/api/v1/extensions/index.json`
+- Blender 入口只保留 `https://yunkezengren.github.io/extension_remote_repo/api/v1/extensions/index.json`
 - 元数据主要来自 ZIP 内的 `blender_manifest.toml`
 - 如果某个 ZIP 不符合 Blender 扩展格式，生成会直接报错
