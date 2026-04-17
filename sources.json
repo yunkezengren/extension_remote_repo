@@ -1,10 +1,10 @@
 [
   {
-    "archive_url": "https://github.com/atticus-lv/AddShaderAttribute/archive/refs/heads/master.zip",
+    "archive_url": "https://github.com/yunkezengren/Blender-addons-Node-Utilities/releases/download/voronoi_linker-5.7.3/voronoi_linker-5.7.4.zip",
     "enabled": true,
-    "website": "https://github.com/atticus-lv/AddShaderAttribute",
+    "website": "https://github.com/yunkezengren/Blender-addons-Node-Utilities",
     "tags": [
-      "Shader"
+      "Node"
     ],
     "notes": "Using a GitHub source archive directly from the master branch."
   }
