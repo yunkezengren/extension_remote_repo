@@ -11,6 +11,8 @@
 
 ## 你需要修改的文件
 
+## 注意推送一个版本后,尽量不要重新上床同版本zip替换旧的,会导致二进制包大小信息记录错误.
+
 只需要维护 [sources.json](/Users/atticus/Desktop/extension_remote_repo_demo/sources.json)。
 
 示例：
